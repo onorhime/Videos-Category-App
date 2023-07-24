@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Entity\Category;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -16,7 +18,7 @@ class FrontController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/video-list', name: 'video-list')]
+    #[Route(path: '/video-list/category/{categoryname},{id}', name: 'video-list')]
     public function videoList(): Response
     {
         return $this->render('front/videolist.html.twig');
@@ -53,5 +55,14 @@ class FrontController extends AbstractController
     public function action(): Response
     {
         return $this->render('front/payment.html.twig');
+    }
+   
+    public function MainCategories(ManagerRegistry $doctrine): Response
+    {
+        // Get all categories with their subcategories and videos count
+        $categories = $doctrine->getRepository(Category::class)->findBy(['parent'=> null], ['name'=>'ASC']);
+        return $this->render('front/_main_categories.html.twig', [
+            'categories' => $categories
+        ]);
     }
 }
